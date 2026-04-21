@@ -18,17 +18,15 @@ public class BaseApp {
 
     public static void start(boolean stream, AiClient client) {
         // TODO:
-        // - Create a new Conversation instance to maintain chat history
-        // - Create a Scanner reading from System.in
-        // - Print a message telling the user how to exit (e.g., type "exit")
-        // - Start a loop:
-        //   - Print the input prompt ("=> ")
-        //   - Read and strip the next line from Scanner
-        //   - If the input equals "exit" (case-insensitive), print a goodbye message and break
-        //   - Wrap the input in a new Message(Role.USER, ...) and add it to Conversation
-        //   - Print "AI: " prefix (no newline)
-        //   - Call client.streamResponse() or client.response() depending on the stream flag
-        //   - Add the returned AI Message to Conversation
+        // 1. Create a Conversation instance and a Scanner reading from System.in
+        // 2. Print a message telling the user how to exit
+        // 3. Loop forever:
+        //    3.1. Print "=> " prompt (no newline) and read the next line from scanner (strip whitespace)
+        //    3.2. If "exit".equalsIgnoreCase(userInput) → print goodbye message and break
+        //    3.3. Add a new Message(Role.USER, userInput) to the conversation
+        //    3.4. Print "AI: " (no newline), then call either client.streamResponse() or client.response()
+        //         passing conversation.getMessages(); which to call depends on the stream flag
+        //    3.5. Add the returned AI Message to the conversation
         throw new TaskNotImplementedException();
     }
 }

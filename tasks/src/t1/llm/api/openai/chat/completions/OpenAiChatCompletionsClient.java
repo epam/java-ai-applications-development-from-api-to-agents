@@ -25,39 +25,39 @@ public class OpenAiChatCompletionsClient extends BaseOpenAiClient {
         super(endpoint, modelName, apiKey, systemPrompt);
         // TODO:
         // https://github.com/openai/openai-java
-        // - Call super(endpoint, modelName, apiKey, systemPrompt)
-        // - Build an OpenAIClient using OpenAIOkHttpClient.builder(), set apiKey, and call build()
-        // - Assign the result to this.client
+        // 1. Build SDK client and assign to this.client:
+        //    this.client = OpenAIOkHttpClient.builder().apiKey(apiKey).build()
     }
 
     @Override
     public Message response(List<Message> messages) {
         // TODO:
-        // - Build ChatCompletionCreateParams using buildParams(messages)
-        // - Call client.chat().completions().create(params)
-        // - Extract content string from choices[0].message.content() (throw if absent)
-        // - Print content to stdout
-        // - Return new Message(Role.ASSISTANT, content)
+        // 1. Build params: var params = buildParams(messages)
+        // 2. Call client.chat().completions().create(params) to get the completion
+        // 3. Extract content from choices[0].message.content() — throw RuntimeException if absent
+        // 4. Print content and return new Message(Role.ASSISTANT, content)
         throw new TaskNotImplementedException();
     }
 
     @Override
     public Message streamResponse(List<Message> messages) {
         // TODO:
-        // - Build ChatCompletionCreateParams using buildParams(messages)
-        // - Open a streaming call via client.chat().completions().createStreaming(params) (try-with-resources)
-        // - For each chunk, extract delta content from choices[0].delta.content()
-        // - Print each non-empty delta token to stdout; accumulate in a StringBuilder
-        // - Print a newline after the stream ends
-        // - Return new Message(Role.ASSISTANT, accumulated content)
+        // 1. Build params and create a StringBuilder to accumulate tokens
+        // 2. Open streaming via client.chat().completions().createStreaming(params) in try-with-resources
+        // 3. For each chunk in stream.stream(), extract the delta token:
+        //    chunk.choices().get(0).delta().content().ifPresent(delta -> { print delta; append to sb })
+        // 4. Print newline and return new Message(Role.ASSISTANT, sb.toString())
         throw new TaskNotImplementedException();
     }
 
     private ChatCompletionCreateParams buildParams(List<Message> messages) {
         // TODO:
-        // - Create a ChatCompletionCreateParams builder; set model and add the system message (systemPrompt)
-        // - Iterate messages: USER → addUserMessage(), ASSISTANT → addMessage() with ChatCompletionAssistantMessageParam
-        // - Build and return the params
+        // 1. Create builder with model and system message:
+        //    ChatCompletionCreateParams.builder().model(modelName).addSystemMessage(systemPrompt)
+        // 2. For each message add it by role:
+        //    - USER → builder.addUserMessage(m.content())
+        //    - ASSISTANT → builder.addMessage(ChatCompletionAssistantMessageParam.builder().content(m.content()).build())
+        // 3. Return builder.build()
         throw new TaskNotImplementedException();
     }
 }

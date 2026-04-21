@@ -17,8 +17,8 @@ public abstract class BaseOpenAiClient extends AiClient {
 
     private static String withBearer(String apiKey) {
         // TODO:
-        // - Validate that apiKey is not null or blank; throw IllegalArgumentException if invalid
-        // - Return the apiKey with "Bearer " prepended (note the trailing space before the key)
+        // 1. Validate apiKey is not null or blank; throw IllegalArgumentException if invalid
+        // 2. Return "Bearer " + apiKey
         throw new TaskNotImplementedException();
     }
 }

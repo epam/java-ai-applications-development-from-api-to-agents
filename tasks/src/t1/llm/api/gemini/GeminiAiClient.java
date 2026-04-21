@@ -31,57 +31,62 @@ public class GeminiAiClient extends AiClient {
         super(endpoint, modelName, apiKey, systemPrompt);
         // TODO:
         // https://github.com/googleapis/java-genai
-        // - Build a Client using Client.builder(), set apiKey, and call build()
-        // - Assign the result to this.client
-        throw new TaskNotImplementedException();
+        // 1. Build the Google GenAI client and assign it to this.client:
+        //    this.client = Client.builder().apiKey(apiKey).build()
     }
 
     @Override
     public Message response(List<Message> messages) {
         // TODO:
-        // - Build GenerateContentConfig using buildConfig()
-        // - Build the contents list using buildContents(messages)
-        // - Call client.models.generateContent(modelName, contents, config)
-        // - Extract text from response via resp.text(); treat null as empty string
-        // - Print content to stdout
-        // - Return new Message(Role.ASSISTANT, content)
+        // 1. Build config using buildConfig() and contents list using buildContents(messages)
+        // 2. Call client.models.generateContent(modelName, contents, config)
+        // 3. Extract text: resp.text() can return null — treat null as empty string
+        // 4. Print content and return new Message(Role.ASSISTANT, content)
         throw new TaskNotImplementedException();
     }
 
     @Override
     public Message streamResponse(List<Message> messages) {
         // TODO:
-        // - Build GenerateContentConfig using buildConfig()
-        // - Build the contents list using buildContents(messages)
-        // - Open a streaming call via client.models.generateContentStream(modelName, contents, config) (try-with-resources)
-        // - For each chunk, extract chunk.text(); skip null or empty values
-        // - Print each non-empty text to stdout; accumulate in a StringBuilder
-        // - Print a newline after the stream ends
-        // - Return new Message(Role.ASSISTANT, accumulated content)
+        // 1. Build config using buildConfig() and contents list using buildContents(messages)
+        // 2. Open streaming with try-with-resources (ResponseStream is AutoCloseable and Iterable):
+        //    try (var stream = client.models.generateContentStream(modelName, contents, config))
+        // 3. Iterate over each chunk; chunk.text() can be null — skip null/empty values;
+        //    print and accumulate non-empty text in a StringBuilder
+        // 4. Print newline and return new Message(Role.ASSISTANT, sb.toString())
         throw new TaskNotImplementedException();
     }
 
     private GenerateContentConfig buildConfig() {
         // TODO:
-        // - Build a GenerateContentConfig with systemInstruction set to a Content containing Part.fromText(systemPrompt)
-        // - Set maxOutputTokens
-        // - Build and return the config
+        // Note: In Gemini the system prompt goes in the config's systemInstruction field, not in messages!
+        // 1. Build and return config:
+        //    return GenerateContentConfig.builder()
+        //            .systemInstruction(Content.builder()
+        //                    .parts(List.of(Part.fromText(systemPrompt)))
+        //                    .build())
+        //            .maxOutputTokens(1024)
+        //            .build()
         throw new TaskNotImplementedException();
     }
 
     private List<Content> buildContents(List<Message> messages) {
         // TODO:
-        // - For each Message, build a Content with:
-        //   - role: toGeminiRole(m.role())
-        //   - parts: a single Part.fromText(m.content())
-        // - Collect all Content objects into a List and return
+        // Note: Gemini uses "model" for AI responses, not "assistant"
+        // 1. Create result list: var contents = new ArrayList<Content>()
+        // 2. For each message build a Content and add it:
+        //    contents.add(Content.builder()
+        //            .role(toGeminiRole(m.role()))
+        //            .parts(List.of(Part.fromText(m.content())))
+        //            .build())
+        // 3. Return the list
         throw new TaskNotImplementedException();
     }
 
     private String toGeminiRole(Role role) {
         // TODO:
-        // - Return "model" if the role is Role.ASSISTANT (Gemini uses "model" not "assistant")
-        // - Otherwise return role.getValue()
+        // Gemini uses "model" for AI responses instead of "assistant"
+        // 1. Return "model" if role == Role.ASSISTANT, otherwise return role.getValue()
         throw new TaskNotImplementedException();
     }
 }

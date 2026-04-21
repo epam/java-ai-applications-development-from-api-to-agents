@@ -22,8 +22,9 @@ public abstract class AiClient {
 
     protected AiClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
         // TODO:
-        // - Validate that apiKey is not null or blank; throw IllegalArgumentException if invalid
-        // - Assign endpoint, modelName, apiKey, and systemPrompt to the corresponding protected fields
+        // 1. Validate that apiKey is not null or blank;
+        //    throw new IllegalArgumentException("API key cannot be null or empty") if invalid
+        // 2. Assign each parameter to the corresponding field
         throw new TaskNotImplementedException();
     }
 

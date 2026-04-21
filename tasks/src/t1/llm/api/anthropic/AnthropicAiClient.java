@@ -24,41 +24,45 @@ public class AnthropicAiClient extends AiClient {
     public AnthropicAiClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
         super(endpoint, modelName, apiKey, systemPrompt);
         // TODO:
-        // - https://github.com/anthropics/anthropic-sdk-java
-        // - Build an AnthropicClient using AnthropicOkHttpClient.builder(), set apiKey, and call build()
-        // - Assign the result to this.client
-        throw new TaskNotImplementedException();
+        // https://github.com/anthropics/anthropic-sdk-java
+        // 1. Build the Anthropic SDK client and assign it to this.client:
+        //    this.client = AnthropicOkHttpClient.builder().apiKey(apiKey).build()
     }
 
     @Override
     public Message response(List<Message> messages) {
         // TODO:
-        // - Build MessageCreateParams using buildParams(messages)
-        // - Call client.messages().create(params)
-        // - Filter the response content blocks for isText(); extract text via asText().text(); concatenate
-        // - Print content to stdout
-        // - Return new Message(Role.ASSISTANT, content)
+        // 1. Build params using buildParams(messages) and call client.messages().create(params)
+        // 2. Filter the response content blocks using isText() and extract text via asText().text();
+        //    concatenate all text blocks into a single string
+        // 3. Print content and return new Message(Role.ASSISTANT, content)
         throw new TaskNotImplementedException();
     }
 
     @Override
     public Message streamResponse(List<Message> messages) {
         // TODO:
-        // - Build MessageCreateParams using buildParams(messages)
-        // - Open a streaming call via client.messages().createStreaming(params) (try-with-resources)
-        // - Filter events where isContentBlockDelta() is true
-        // - From each event's delta, check isText(); extract text via asText().text()
-        // - Print each non-empty text to stdout; accumulate in a StringBuilder
-        // - Print a newline after the stream ends
-        // - Return new Message(Role.ASSISTANT, accumulated content)
+        // 1. Build params and open streaming via client.messages().createStreaming(params) in try-with-resources
+        // 2. Filter events with: stream.stream().filter(RawMessageStreamEvent::isContentBlockDelta)
+        // 3. For each event, get the delta via event.asContentBlockDelta().delta()
+        //    If delta.isText() is true, extract text with delta.asText().text(); print and accumulate in StringBuilder
+        // 4. Print newline and return new Message(Role.ASSISTANT, sb.toString())
         throw new TaskNotImplementedException();
     }
 
     private MessageCreateParams buildParams(List<Message> messages) {
         // TODO:
-        // - Create a MessageCreateParams builder; set model, system (systemPrompt), and maxTokens (e.g. 1024)
-        // - Iterate messages: USER → addUserMessage(), ASSISTANT → addAssistantMessage()
-        // - Build and return the params
+        // Note: Anthropic requires maxTokens and puts the system prompt as a separate field!
+        // 1. Create builder with required fields:
+        //    var builder = MessageCreateParams.builder()
+        //            .model(modelName)
+        //            .system(systemPrompt)    // separate field, NOT in the messages array
+        //            .maxTokens(1024L)        // required — Anthropic will reject requests without it
+        // 2. Iterate messages and add each by role:
+        //    - Role.USER → builder.addUserMessage(m.content())
+        //    - Role.ASSISTANT → builder.addAssistantMessage(m.content())
+        //    (skip other roles)
+        // 3. Return: return builder.build()
         throw new TaskNotImplementedException();
     }
 }
