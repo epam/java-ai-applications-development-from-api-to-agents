@@ -3,7 +3,8 @@ package commons.model;
 public enum Role {
     SYSTEM("system"),
     USER("user"),
-    ASSISTANT("assistant");
+    ASSISTANT("assistant"),
+    TOOL("tool");
 
     private final String value;
 
