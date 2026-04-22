@@ -1,6 +1,6 @@
 # RAG (Retrieval-Augmented Generation) Implementation
 
-A Python implementation task to build a complete RAG system for microwave manual assistance using LangChain, FAISS, and OpenAI
+A Java implementation task to build a complete RAG system for microwave manual assistance using Spring AI, LangChain4j, and OpenAI.
 
 ---
 
@@ -22,52 +22,59 @@ Your implementation will demonstrate the complete RAG workflow:
 
 ### If the task in the main branch is hard for you, then switch to the `main-detailed` branch
 
-- OpenAI Documentation: https://developers.openai.com/api/docs/guides/embeddings
-- Langchain OpenAI Embeddings Documentation: https://docs.langchain.com/oss/python/integrations/text_embedding/openai
-- Langchain OpenAI Chat Documentation: https://docs.langchain.com/oss/python/integrations/chat/openai
-- Langchain FAISS Documentation: https://docs.langchain.com/oss/python/integrations/vectorstores/faiss
-- Langchain RecursiveCharacterTextSplitter Documentation: https://docs.langchain.com/oss/python/integrations/splitters
+Complete the **primary** implementation in [SpringRagApp.java](spring/SpringRagApp.java) by filling in all the TODO sections:
 
-Complete the implementation in [app.py](app.py) by filling in all the TODO sections:
+### ⚙️ **Step 1: Vector Store Setup (`setupVectorStore` method)**
+- Print a startup message
+- Build a `SimpleVectorStore` using `SimpleVectorStore.builder(embeddingModel).build()`
+- Check if the index file already exists on disk
+- If yes: load it using `store.load()` and print a confirmation
+- If no: call `populateStore(store)`
+- Return the store
 
-### 🔍 **Step 1: Vector Store Setup (`_setup_vectorstore` method)**
-- Check if FAISS index already exists locally
-- Load existing index or create new one
-- Handle both scenarios properly
+### 📖 **Step 2: Document Processing (`populateStore` method)**
+- Load [microwave_manual.txt](microwave_manual.txt) using `TextReader` and `FileSystemResource`
+- Split documents into chunks using `TokenTextSplitter` (chunkSize=75)
+- Add chunks to the store and save the index to disk
 
-### 📖 **Step 2: Document Processing (`_create_new_index` method)**
-- Load the [microwave_manual.txt](microwave_manual.txt) text file
-- Split documents into chunks using RecursiveCharacterTextSplitter
-- Create FAISS vector store from document chunks
-- Save the index locally for future use
+### 🔎 **Step 3: Context Retrieval (`retrieveContext` method)**
+- Build a `SearchRequest` with query, topK, and similarityThreshold
+- Call `vectorStore.similaritySearch(request)`
+- Collect and return relevant document texts joined with `"\n\n"`
 
-### 🔎 **Step 3: Context Retrieval (`retrieve_context` method)**
-- Implement similarity search with relevance scores
-- Extract and format relevant document chunks
-- Return formatted context for the LLM
-> You can experiment with these parameters in the `retrieve_context` method:
+> You can experiment with these parameters in the `retrieveContext` call in `main`:
 
 > `k`: Number of relevant chunks to retrieve
 
-> `score`: Similarity threshold for chunk relevance
- 
->`chunk_size`: Size of document chunks
+> `minScore`: Similarity threshold for chunk relevance (0.0–1.0)
 
->`chunk_overlap`: Overlap between chunks
+### 🔗 **Step 4: Prompt Augmentation (`augmentPrompt` method)**
+- Replace `{context}` and `{query}` placeholders in `USER_PROMPT_TEMPLATE`
+- Print and return the formatted prompt
 
-### 🔗 **Step 4: Prompt Augmentation (`augment_prompt` method)**
-- Format the user prompt with retrieved context
-- Structure the prompt according to the RAG template
+### 🤖 **Step 5: Answer Generation (`generateAnswer` method)**
+- Build `ChatCompletionCreateParams` with system prompt, user message, model, and temperature
+- Call the OpenAI client and extract the response content
 
-### 🤖 **Step 5: Answer Generation (`generate_answer` method)**
-- Create proper message structure for the LLM
-- Call OpenAI to generate the final answer
-- Return the generated response
+### ▶️ **Step 6: Main Configuration**
+- Instantiate `OpenAiEmbeddingModel` with `OpenAiApi`, `MetadataMode.EMBED`, and `OpenAiEmbeddingOptions` (model `text-embedding-3-small`)
+- Wrap it in a `SpringRagApp` and start the interactive scanner loop
 
-### ⚙️ **Step 6: Main Configuration**
-- Set up OpenAI embeddings client
-- Configure the chat completion client
-- Initialize the RAG system with proper parameters
+---
+
+## Optional Task — LangChain4j variant
+
+Complete the same RAG pipeline in [RagApp.java](langchain/RagApp.java).  
+The logic is **identical** to the Spring version, but uses LangChain4j APIs instead:
+
+| Concept | Spring AI | LangChain4j |
+|---------|-----------|-------------|
+| Vector store | `SimpleVectorStore` | `InMemoryEmbeddingStore<TextSegment>` |
+| Document loading | `TextReader` + `FileSystemResource` | `FileSystemDocumentLoader.loadDocument()` |
+| Splitting | `TokenTextSplitter` | `DocumentSplitters.recursive(300, 50)` |
+| Embedding | `OpenAiEmbeddingModel` (Spring) | `OpenAiEmbeddingModel` (LangChain4j) |
+| Search | `SearchRequest` + `similaritySearch()` | `EmbeddingSearchRequest` + `embeddingStore.search()` |
+| Index persistence | `store.save()` / `store.load()` | `store.serializeToFile()` / `InMemoryEmbeddingStore.fromFile()` |
 
 ---
 
