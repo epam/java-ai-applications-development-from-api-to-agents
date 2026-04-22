@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>khshanovskyi</groupId>
-    <artifactId>java-ai-applecations-development-from-api-to-agents</artifactId>
+    <artifactId>java-ai-applications-development-from-api-to-agents</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -14,27 +14,27 @@
     </parent>
 
     <properties>
-        <java.version>25</java.version>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <java.version>23</java.version>
+        <maven.compiler.source>23</maven.compiler.source>
+        <maven.compiler.target>23</maven.compiler.target>
     </properties>
 
     <dependencies>
-
+        <!-- Official OpenAI Java SDK — verify latest version at central.sonatype.com/artifact/com.openai/openai-java -->
         <dependency>
             <groupId>com.openai</groupId>
             <artifactId>openai-java</artifactId>
-            <version>4.32.0</version>
-            <scope>compile</scope>
+            <version>2.1.0</version>
         </dependency>
 
+        <!-- Official Anthropic Java SDK — verify latest version at central.sonatype.com/artifact/com.anthropic/anthropic-java -->
         <dependency>
             <groupId>com.anthropic</groupId>
             <artifactId>anthropic-java</artifactId>
             <version>2.26.0</version>
-            <scope>compile</scope>
         </dependency>
 
+        <!-- Official Google GenAI Java SDK — verify latest version at central.sonatype.com/artifact/com.google.genai/google-genai -->
         <dependency>
             <groupId>com.google.genai</groupId>
             <artifactId>google-genai</artifactId>
@@ -55,8 +55,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>25</source>
-                    <target>25</target>
+                    <source>23</source>
+                    <target>23</target>
                 </configuration>
             </plugin>
         </plugins>
