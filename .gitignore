@@ -66,3 +66,9 @@ build/
 #Claude
 .claude/
 .claudeignore
+CLAUDE.md
+
+#Gemini
+.gemini/
+.geminiignore
+GEMINI.md
