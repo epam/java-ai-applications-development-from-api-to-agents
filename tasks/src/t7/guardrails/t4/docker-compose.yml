@@ -1,0 +1,11 @@
+services:
+  pii-service:
+    build: ./pii/service
+    ports:
+      - "8060:8060"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8060/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
