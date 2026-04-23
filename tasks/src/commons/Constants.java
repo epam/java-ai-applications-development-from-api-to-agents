@@ -28,6 +28,8 @@ public final class Constants {
     public static final String GEMINI_ENDPOINT =
             "https://generativelanguage.googleapis.com/v1beta/models";
 
+    public static final String USER_SERVICE_ENDPOINT = "http://localhost:8041";
+
     public static final String OPENAI_API_KEY = System.getenv("OPENAI_API_KEY");
     public static final String ANTHROPIC_API_KEY = System.getenv("ANTHROPIC_API_KEY");
     public static final String GEMINI_API_KEY = System.getenv("GEMINI_API_KEY");
@@ -38,6 +40,8 @@ public final class Constants {
     public static final String CLAUDE_SONNET_4_5 = "claude-sonnet-4-5";
     public static final String GEMINI_3_FLASH_PREVIEW = "gemini-3-flash-preview";
     public static final String GPT_5_4 = "gpt-5.4";
+    public static final String GPT_4_1_NANO = "gpt-4.1-nano";
+    public static final String GPT_4O_MINI = "gpt-4o-mini";
 
     public static final String WHISPER_1 = "whisper-1";
     public static final String GPT_4O_TRANSCRIBE = "gpt-4o-transcribe";
