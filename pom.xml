@@ -110,6 +110,24 @@
             <version>42.7.7</version>
         </dependency>
 
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- MCP SERVER -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+        </dependency>
+
+        <!-- MCP CLIENT -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-client</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -121,6 +139,7 @@
                 <configuration>
                     <source>25</source>
                     <target>25</target>
+                    <parameters>true</parameters>
                 </configuration>
             </plugin>
         </plugins>
