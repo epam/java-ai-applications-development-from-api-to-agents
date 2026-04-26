@@ -27,8 +27,8 @@ Service.
 ### 1. Create and run HTTP MCP server:
 
 1. Run User Service [root docker-compose](docker-compose.yml) (Optional step in case if you have it from previous tasks)
-2. Open [BaseServer.java](mcp/server/BaseServer.java) and implement all ***TODO***
-3. Open [HttpServer.java](mcp/server/HttpServer.java) and **Run** it
+2. Open [UmsMcpServer.java](mcp/server/UmsMcpServer.java) and implement all ***TODO***
+3. Open [HttpServerApp.java](mcp/server/HttpServerApp.java) and **Run** it
 
 <details> 
 <summary><b>OPTIONAL: Work with HTTP MCP server in Postman</b></summary>
@@ -116,11 +116,7 @@ mvn compile
 
 Open the file (create it if it doesn't exist) and add your server.
 
-> **Why `-q` is required for Option A:** `mvn exec:java` prints `[INFO]` lines to stdout.
-> The STDIO MCP protocol uses stdout exclusively for JSON-RPC messages — any extra text
-> on stdout corrupts framing and causes `-32000: Connection closed`. The `-q` flag silences Maven.
-
-**Option A — Run via Maven exec:java:**
+**Run via Maven exec:java:**
 
 > **Java version pitfall:** Maven uses its own bundled JDK which may differ from your project's JDK.
 > If your classes are compiled with Java 25 but Maven runs on Java 23, you get `UnsupportedClassVersionError`
@@ -146,51 +142,6 @@ Open the file (create it if it doesn't exist) and add your server.
   }
 }
 ```
-
----
-
-**Option B — Shell script wrapper (faster startup, recommended):**
-
-This avoids Maven startup overhead and gives you full control over which JVM is used.
-
-**Step B-1.** Generate the dependency classpath (re-run whenever `pom.xml` changes):
-
-```bash
-cd {ABSOLUTE_PATH}/java-ai-applications-development-from-api-to-agents
-mvn compile dependency:build-classpath -Dmdep.outputFile=.mcp-classpath.txt
-```
-
-**Step B-2.** Create `run-mcp-stdio.sh` in the project root:
-
-```bash
-#!/bin/bash
-DIR="$(cd "$(dirname "$0")" && pwd)"
-# Use the full path to your java binary (run `which java` to find it)
-exec /usr/bin/java \
-  -cp "$DIR/target/classes:$(cat "$DIR/.mcp-classpath.txt")" \
-  t9.mcp.fundamentals.mcp.server.StdioServerApp
-```
-
-**Step B-3.** Make it executable:
-
-```bash
-chmod +x {ABSOLUTE_PATH}/java-ai-applications-development-from-api-to-agents/run-mcp-stdio.sh
-```
-
-**Step B-4.** Use the script in the config:
-
-```json
-{
-  "mcpServers": {
-    "users-management": {
-      "command": "{ABSOLUTE_PATH}/java-ai-applications-development-from-api-to-agents/run-mcp-stdio.sh"
-    }
-  }
-}
-```
-
-> **Windows users:** create `run-mcp-stdio.bat` instead and adapt the paths accordingly
-> (`%~dp0target\classes` for the class directory; `for /f` to read the classpath file).
 
 ---
 
