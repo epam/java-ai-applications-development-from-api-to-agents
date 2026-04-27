@@ -13,39 +13,32 @@ public class SearchUsersTool extends BaseUserServiceTool {
 
     @Override
     public String getName() {
-        //TODO: Return the tool name: "search_users"
+        //TODO: 1. Return the string "search_users".
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String getDescription() {
-        //TODO: Return a short description of this tool's purpose.
-        //      Example: "Searches users by name, surname, email, and/or gender."
+        //TODO: 1. Return a clear description of the tool's purpose.
+        //         Example: "Searches users by name, surname, email, and/or gender."
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String getInputSchema() {
-        //TODO: Return a JSON Schema string for this tool's input.
-        //      All parameters are optional — none are required ("required": []):
-        //        - "name" (string): user first name
-        //        - "surname" (string): user last name
-        //        - "email" (string): user email address
-        //        - "gender" (string): restricted values — use "enum": ["male", "female"]
+        //TODO: 1. Return a JSON Schema string defining the search parameters.
+        //         All parameters should be optional: "name", "surname", "email" (strings), and "gender".
+        //         Note: Use an enum for "gender" with values ["male", "female"].
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String execute(Map<String, Object> arguments) {
         //TODO:
-        // 1. Extract optional parameters (each may be null if not provided by the model):
-        //    String name    = (String) arguments.get("name");
-        //    String surname = (String) arguments.get("surname");
-        //    String email   = (String) arguments.get("email");
-        //    String gender  = (String) arguments.get("gender");
-        // 2. Call userClient.searchUsers(name, surname, email, gender) and return its result
-        // 3. Wrap in try-catch Exception:
-        //    return "Error while searching users: " + e.getMessage();
+        // 1. Extract the optional search parameters from the arguments Map:
+        //    "name", "surname", "email", and "gender".
+        // 2. Call userClient.searchUsers(name, surname, email, gender) and return the list of users found.
+        // 3. Wrap in a try-catch to return an error message if the search fails.
         throw new TaskNotImplementedException();
     }
 }

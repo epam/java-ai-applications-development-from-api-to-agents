@@ -20,22 +20,17 @@ public class App {
 
     public static void main(String[] args) {
         //TODO:
-        // 1. Create UserServiceClient:
-        //    UserServiceClient userClient = new UserServiceClient();
-        // 2. Create the tool list — each tool gets the resources it needs:
-        //    List<BaseTool> tools = List.of(
-        //        new WebSearchTool(Constants.OPENAI_API_KEY),
-        //        new GetUserByIdTool(userClient),
-        //        new SearchUsersTool(userClient),
-        //        new CreateUserTool(userClient),
-        //        new UpdateUserTool(userClient),
-        //        new DeleteUserTool(userClient)
-        //    );
-        // 3. Create the agent — pick one (comment the other out to switch providers):
-        //    BaseAgent agent = new OpenAIBasedAgent(Constants.GPT_5_4, Constants.OPENAI_API_KEY, tools, Prompts.SYSTEM_PROMPT);
-        //    // BaseAgent agent = new AnthropicBasedAgent(Constants.CLAUDE_SONNET_4_5, Constants.ANTHROPIC_API_KEY, tools, Prompts.SYSTEM_PROMPT);
-        // 4. Create a Conversation to maintain history across turns:
-        //    Conversation conversation = new Conversation();
+        // 1. Create a new UserServiceClient to interact with the backend user service
+        // 2. Initialize the list of tools available to the agent.
+        //    Each tool requires specific resources (API keys or service clients):
+        //        - WebSearchTool(Constants.OPENAI_API_KEY),
+        //        - GetUserByIdTool(userClient),
+        //        - SearchUsersTool(userClient),
+        //        - CreateUserTool(userClient),
+        //        - UpdateUserTool(userClient),
+        //        - DeleteUserTool(userClient)
+        // 3. Instantiate the BaseAgent. Pick either OpenAIBasedAgent or AnthropicBasedAgent
+        // 4. Create a new Conversation object to track the message history across turns
 
         System.out.println("Type your question or 'exit' to quit.");
         System.out.println("Sample:");
@@ -53,19 +48,16 @@ public class App {
             }
 
             //TODO:
-            // 1. Add the user's message to the conversation:
-            //    conversation.addMessage(new Message(Role.USER, userInput));
-            // 2. Create a mutable copy so the agent can append intermediate tool-call messages.
-            //    Record the current size first to know which messages were added by the agent:
-            //    int prevSize = conversation.getMessages().size();
-            //    List<Message> messages = new ArrayList<>(conversation.getMessages());
-            // 3. Call the agent with the current conversation history:
+            // 1. Wrap the user input in a Message with Role.USER and add it to the conversation.
+            // 2. Prepare a mutable copy of the current message history.
+            //    Note: The agent will append intermediate messages (tool calls and results) to this list.
+            // 3. Capture the current size of the message list before calling the agent.
+            //    This helps in identifying new intermediate messages added during the turn:
+            //    int prevSize = messages.size();
+            // 4. Request a response from the agent:
             //    Message aiMessage = agent.getResponse(messages, true);
-            // 4. Sync intermediate messages (tool calls + tool results) back into conversation:
-            //    for (int i = prevSize; i < messages.size(); i++) { conversation.addMessage(messages.get(i)); }
-            // 5. Add the final AI response to conversation and print it:
-            //    conversation.addMessage(aiMessage);
-            //    System.out.println("🤖: " + aiMessage.content());
+            // 5. Sync any new intermediate messages (indices from prevSize onwards) back into the conversation object.
+            // 6. Finally, add the definitive AI response (aiMessage) to the conversation and print it to the console.
 
             System.out.println("=".repeat(100));
             System.out.println();

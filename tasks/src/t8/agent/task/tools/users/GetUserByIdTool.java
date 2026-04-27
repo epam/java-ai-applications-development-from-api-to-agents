@@ -13,33 +13,31 @@ public class GetUserByIdTool extends BaseUserServiceTool {
 
     @Override
     public String getName() {
-        //TODO: Return the tool name: "get_user_by_id"
+        //TODO: 1. Return the string "get_user_by_id".
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String getDescription() {
-        //TODO: Return a short description of this tool's purpose.
-        //      Example: "Retrieves full information about a user by their ID."
+        //TODO: 1. Return a clear description of the tool's purpose.
+        //         Example: "Retrieves full information about a user by their ID."
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String getInputSchema() {
-        //TODO: Return a JSON Schema string for this tool's input.
-        //      This tool accepts a single required parameter:
-        //        - "id" (number): the ID of the user to retrieve
-        //      Use the same schema structure as DeleteUserTool.
+        //TODO: 1. Return a JSON Schema string for the input.
+        //         The tool expects an object with one required number property: "id".
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String execute(Map<String, Object> arguments) {
         //TODO:
-        // 1. Get the user ID: int id = ((Number) arguments.get("id")).intValue();
-        // 2. Call userClient.getUser(id) and return its result
-        // 3. Wrap in try-catch Exception:
-        //    return "Error while retrieving user by id: " + e.getMessage();
+        // 1. Extract the user ID from the arguments Map.
+        //    Note: Cast arguments.get("id") to Number before calling intValue().
+        // 2. Call userClient.getUser(id) and return the resulting user data.
+        // 3. Wrap in a try-catch to return an error message if the retrieval fails.
         throw new TaskNotImplementedException();
     }
 }

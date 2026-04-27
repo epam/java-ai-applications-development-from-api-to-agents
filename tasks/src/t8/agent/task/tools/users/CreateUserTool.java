@@ -17,39 +17,33 @@ public class CreateUserTool extends BaseUserServiceTool {
 
     @Override
     public String getName() {
-        //TODO: Return the tool name: "add_user"
+        //TODO: 1. Return the string "add_user".
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String getDescription() {
-        //TODO: Return a short description of this tool's purpose.
-        //      Example: "Adds a new user to the system."
+        //TODO: 1. Return a clear description of the tool's purpose.
+        //         Example: "Adds a new user to the system."
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String getInputSchema() {
-        //TODO: Return a JSON Schema string describing the fields for user creation.
-        //      Include all fields a user record can have:
-        //        - name, surname, email, phone, date_of_birth (strings)
-        //        - gender, company, about_me (strings)
-        //        - salary (number)
-        //        - address (object: country, city, street, flat_house — all strings)
-        //        - credit_card (object: num, cvv, exp_date — all strings)
-        //      Required fields: "name", "surname", "email", "about_me"
-        //      Use a text block: return """ { ... } """;
+        //TODO: 1. Return a JSON Schema string defining the user creation fields.
+        //         Include: name, surname, email, phone, date_of_birth, gender, company, about_me (strings), salary (number).
+        //         Also include nested objects: address (country, city, street, flat_house) and credit_card (num, cvv, exp_date).
+        //         Note: Set "name", "surname", "email", and "about_me" as required fields.
         throw new TaskNotImplementedException();
     }
 
     @Override
     public String execute(Map<String, Object> arguments) {
         //TODO:
-        // 1. Convert arguments map to UserCreate using Jackson:
-        //    UserCreate user = objectMapper.convertValue(arguments, UserCreate.class);
-        // 2. Call userClient.addUser(user) and return its result (a String response from the service)
-        // 3. Wrap in try-catch Exception:
-        //    return "Error while creating a new user: " + e.getMessage();
+        // 1. Convert the arguments Map into a UserCreate object.
+        //    Use objectMapper.convertValue(arguments, UserCreate.class).
+        // 2. Call userClient.addUser(user) and return the response string.
+        // 3. Wrap in a try-catch to return an error message if the creation fails.
         throw new TaskNotImplementedException();
     }
 }
