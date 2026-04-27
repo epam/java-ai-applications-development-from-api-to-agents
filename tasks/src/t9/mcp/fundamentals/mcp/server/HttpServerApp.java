@@ -17,10 +17,7 @@ public class HttpServerApp {
                 "spring.ai.mcp.server.protocol", "STREAMABLE",
                 "logging.level.io.modelcontextprotocol", "DEBUG",
                 "logging.level.org.springaicommunity.mcp", "DEBUG",
-                "logging.level.t9.mcp.fundamentals", "INFO",
-                "spring.autoconfigure.exclude",
-                "org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration," +
-                "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
+                "logging.level.t9.mcp.fundamentals", "INFO"
         ));
         app.run(args);
     }

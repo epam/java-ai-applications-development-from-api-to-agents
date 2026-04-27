@@ -12,10 +12,7 @@ public class McpServerApp {
         SpringApplication app = new SpringApplication(McpServerApp.class);
         app.setDefaultProperties(Map.of(
                 "server.port", "8006",
-                "logging.level.t10.mcp.advanced", "DEBUG",
-                "spring.autoconfigure.exclude",
-                "org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration," +
-                "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
+                "logging.level.t10.mcp.advanced", "DEBUG"
         ));
         app.run(args);
     }
