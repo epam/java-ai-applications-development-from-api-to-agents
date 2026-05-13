@@ -15,16 +15,17 @@ Open [t1/ImageAnalysis.java](t1/ImageAnalysis.java) and implement the TODO:
 - Pass both images in a single message and ask the model to generate a poem based on them
 
 ### 2. Image Generation
-#### DALL-E 3
-Open [t2/DalleImageGeneration.java](t2/DalleImageGeneration.java) and implement the TODO:
-- Generate an image of `"Smiling catdog"` using `dall-e-3` via `/v1/images/generations`
-- Play with parameters: `size` (SQUARE / PORTRAIT / LANDSCAPE), `style` (VIVID / NATURAL), `quality` (STANDARD / HD)
-- The response contains a URL to the generated image
 
-#### GPT Image 1
+#### GPT Image
 Open [t2/GptImageGeneration.java](t2/GptImageGeneration.java) and implement the TODO:
 - Generate an image of `"Smiling catdog"` using `gpt-image-1` via `/v1/images/generations`
 - Decode the base64 response and save the image locally
+
+#### GPT Image Edit
+Open [t2/GptImageEdit.java](t2/GptImageEdit.java) and implement the TODO:
+- Edit an existing image (`logo.png`) using `gpt-image-1` via `/v1/images/edits`
+- Send the request as `multipart/form-data` with `model`, `prompt`, and `image` fields
+- Decode the base64 response and save the edited image locally
 
 ### 3. Speech to Text
 Open [t3/SpeechToText.java](t3/SpeechToText.java) and implement the TODO:
