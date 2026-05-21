@@ -1,21 +1,20 @@
 package t1.llm.api.anthropic;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.exceptions.TaskNotImplementedException;
-import t1.llm.api.AiClient;
 import commons.model.Message;
 import commons.model.Role;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import t1.llm.api.AiClient;
 
 /**
  * Anthropic Claude client using raw HTTP — no SDK.
@@ -52,7 +51,26 @@ public class CustomAnthropicAiClient extends AiClient {
         // - Print content to stdout
         // - Return new Message(Role.ASSISTANT, content)
         // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        try {
+            String requestBody = buildRequestBody(messages, false);
+            HttpRequest httpRequest = buildRequest(requestBody);
+            HttpResponse<String> httpResponse = http.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (httpResponse.statusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : " + httpResponse.statusCode());
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            JsonNode root = MAPPER.readTree(httpResponse.body());
+            for (JsonNode block : root.path("content")) {
+                if ("text".equals(block.path("type").asText())) {
+                    stringBuilder.append(block.path("text").asText(""));
+                }
+            }
+            System.out.println(stringBuilder);
+            return new Message(Role.ASSISTANT, stringBuilder.toString());
+        }catch (Exception e) {
+            throw new RuntimeException("AnthropicAiClient API call failed", e);
+        }
     }
 
     @Override
@@ -69,7 +87,48 @@ public class CustomAnthropicAiClient extends AiClient {
         // - Print a newline after the stream ends
         // - Return new Message(Role.ASSISTANT, accumulated content)
         // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        try {
+            String requestBody = buildRequestBody(messages, true);
+            HttpRequest httpRequest = buildRequest(requestBody);
+            HttpResponse<Stream<String>> httpResponse = http.send(httpRequest, HttpResponse.BodyHandlers.ofLines());
+
+            if (httpResponse.statusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : " + httpResponse.statusCode());
+            }
+
+            StringBuilder fullMessage = new StringBuilder();
+            httpResponse.body()
+                .filter(m -> m.startsWith("data: "))
+                .map(m -> m.substring(6).strip())
+                .takeWhile(m -> {
+                    try {
+                        return !"message_stop".equals(MAPPER.readTree(m).path("type").asText());
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("JSON parsing failed", e);
+                    }
+                })
+                .forEach(m -> {
+                    try {
+                        JsonNode root = MAPPER.readTree(m);
+                        if ("content_block_delta".equals(root.path("type").asText())) {
+                            JsonNode delta = root.path("delta");
+                            if ("text_delta".equals(delta.path("type").asText())) {
+                                String text = delta.path("text").asText("");
+                                if (!text.isEmpty()) {
+                                    System.out.print(text);
+                                    fullMessage.append(text);
+                                }
+                            }
+                        }
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("JSON parsing failed", e);
+                    }
+                });
+            System.out.println();
+            return new Message(Role.ASSISTANT, fullMessage.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("AnthropicAiClient API call failed", e);
+        }
     }
 
     private HttpRequest buildRequest(String body) {
@@ -80,7 +139,14 @@ public class CustomAnthropicAiClient extends AiClient {
         // - Add "anthropic-version: 2023-06-01" header (required by Anthropic API)
         // - Set POST body with HttpRequest.BodyPublishers.ofString(body)
         // - Build and return the HttpRequest
-        throw new TaskNotImplementedException();
+        HttpRequest.Builder builder = HttpRequest.newBuilder();
+        builder.uri(URI.create(this.endpoint));
+        builder.header("x-api-key", this.apiKey);
+        builder.header("Content-Type", "application/json");
+        builder.header("anthropic-version", "2023-06-01");
+        builder.POST(HttpRequest.BodyPublishers.ofString(body));
+
+        return builder.build();
     }
 
     private String buildRequestBody(List<Message> messages, boolean stream) {
@@ -90,6 +156,20 @@ public class CustomAnthropicAiClient extends AiClient {
         // - If stream is true, add "stream": true
         // - Serialize to JSON string with ObjectMapper and return
         // - Wrap checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        try {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("model", modelName);
+            map.put("system", systemPrompt);
+            map.put("max_tokens", 1024);
+
+            if (stream) {
+                map.put("stream", stream);
+            }
+
+            map.put("messages", messages.stream().map(Message::toMap).toList());
+            return MAPPER.writeValueAsString(map);
+        } catch (Exception e) {
+            throw new RuntimeException("Error building request body", e);
+        }
     }
 }

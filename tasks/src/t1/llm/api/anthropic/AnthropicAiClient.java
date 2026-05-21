@@ -2,13 +2,16 @@ package t1.llm.api.anthropic;
 
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import com.anthropic.core.http.StreamResponse;
+import com.anthropic.models.messages.ContentBlock;
 import com.anthropic.models.messages.MessageCreateParams;
+import com.anthropic.models.messages.RawContentBlockDelta;
+import com.anthropic.models.messages.RawMessageStreamEvent;
 import commons.exceptions.TaskNotImplementedException;
-import t1.llm.api.AiClient;
 import commons.model.Message;
 import commons.model.Role;
-
 import java.util.List;
+import t1.llm.api.AiClient;
 
 /**
  * Anthropic Claude client using the official Anthropic Java SDK.
@@ -27,7 +30,7 @@ public class AnthropicAiClient extends AiClient {
         // - https://github.com/anthropics/anthropic-sdk-java
         // - Build an AnthropicClient using AnthropicOkHttpClient.builder(), set apiKey, and call build()
         // - Assign the result to this.client
-        throw new TaskNotImplementedException();
+        this.client = AnthropicOkHttpClient.builder().apiKey(apiKey).build();
     }
 
     @Override
@@ -38,7 +41,13 @@ public class AnthropicAiClient extends AiClient {
         // - Filter the response content blocks for isText(); extract text via asText().text(); concatenate
         // - Print content to stdout
         // - Return new Message(Role.ASSISTANT, content)
-        throw new TaskNotImplementedException();
+        MessageCreateParams messageCreateParams = buildParams(messages);
+        com.anthropic.models.messages.Message message = client.messages().create(messageCreateParams);
+        String content = message.content().stream().filter(ContentBlock::isText)
+            .map(contentBlock -> contentBlock.asText().text()).reduce("", String::concat);
+        System.out.println(content);
+
+        return new Message(Role.ASSISTANT, content);
     }
 
     @Override
@@ -51,7 +60,23 @@ public class AnthropicAiClient extends AiClient {
         // - Print each non-empty text to stdout; accumulate in a StringBuilder
         // - Print a newline after the stream ends
         // - Return new Message(Role.ASSISTANT, accumulated content)
-        throw new TaskNotImplementedException();
+        MessageCreateParams messageCreateParams = buildParams(messages);
+        try(StreamResponse<RawMessageStreamEvent> streaming = client.messages().createStreaming(messageCreateParams)) {
+            StringBuilder sb = new StringBuilder();
+            streaming.stream().filter(RawMessageStreamEvent::isContentBlockDelta)
+                .map(s -> s.asContentBlockDelta().delta())
+                .filter(RawContentBlockDelta::isText)
+                .map(s -> s.asText().text())
+                .filter(s -> !s.isEmpty())
+                .forEach(s -> {
+                    System.out.print(s);
+                    sb.append(s);
+                });
+            System.out.println();
+            return new Message(Role.ASSISTANT, sb.toString());
+        } catch (RuntimeException e) {
+            throw new RuntimeException("AnthropicAiClient streaming failed", e);
+        }
     }
 
     private MessageCreateParams buildParams(List<Message> messages) {
@@ -59,6 +84,19 @@ public class AnthropicAiClient extends AiClient {
         // - Create a MessageCreateParams builder; set model, system (systemPrompt), and maxTokens (e.g. 1024)
         // - Iterate messages: USER → addUserMessage(), ASSISTANT → addAssistantMessage()
         // - Build and return the params
-        throw new TaskNotImplementedException();
+        MessageCreateParams.Builder builder = MessageCreateParams.builder();
+        builder.model(modelName);
+        builder.system(systemPrompt);
+        builder.maxTokens(1024);
+
+        messages.forEach(message -> {
+            switch (message.role()) {
+                case USER -> builder.addUserMessage(message.content());
+                case ASSISTANT -> builder.addAssistantMessage(message.content());
+                default -> throw new RuntimeException("Unknown role: " + message.role());
+            }
+        });
+
+        return builder.build();
     }
 }

@@ -21,10 +21,13 @@ public abstract class AiClient {
     protected String systemPrompt;
 
     protected AiClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
-        //TODO:
-        // - Validate that apiKey is not null or blank; throw IllegalArgumentException if invalid
-        // - Assign endpoint, modelName, apiKey, and systemPrompt to the corresponding protected fields
-        throw new TaskNotImplementedException();
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalArgumentException("API KEY must not be null or empty");
+        }
+        this.endpoint = endpoint;
+        this.modelName = modelName;
+        this.apiKey = apiKey;
+        this.systemPrompt = systemPrompt;
     }
 
     /**

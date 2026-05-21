@@ -29,6 +29,29 @@ public class BaseApp {
         //   - Print "AI: " prefix (no newline)
         //   - Call client.streamResponse() or client.response() depending on the stream flag
         //   - Add the returned AI Message to Conversation
-        throw new TaskNotImplementedException();
+
+        Conversation conversation = new Conversation();
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Type \"exit\" to quit.");
+
+        while (true) {
+            System.out.print("=> ");
+            String input = scanner.nextLine().strip();
+
+            if (input.equalsIgnoreCase("exit")) {
+                System.out.println("Goodbye!");
+                break;
+            }
+            Message userMessage = new Message(Role.USER, input);
+            conversation.addMessage(userMessage);
+
+            System.out.print("AI: ");
+            Message aiMessage = stream
+                ? client.streamResponse(conversation.getMessages())
+                : client.response(conversation.getMessages());
+
+            conversation.addMessage(aiMessage);
+        }
     }
 }

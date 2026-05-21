@@ -20,7 +20,16 @@ public class AnthropicApp {
                 DEFAULT_SYSTEM_PROMPT
         );
 
-        // Switch between sdkClient and customClient to compare SDK vs raw HTTP
-        BaseApp.start(true, sdkClient);
+        // Switch between sdkClient/customClient and stream=true/false to compare combinations
+        boolean stream = true;
+        String clientName = "CustomAnthropicAiClient (HTTP)"; // "AnthropicAiClient (SDK)"; // or "CustomAnthropicAiClient (HTTP)";
+        var client = sdkClient; // or sdkClient
+
+        System.out.println("╔══════════════════════════════════════════════════╗");
+        System.out.println("  Client : " + clientName);
+        System.out.println("  Stream : " + stream);
+        System.out.println("╚══════════════════════════════════════════════════╝");
+
+        BaseApp.start(stream, client);
     }
 }
