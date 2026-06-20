@@ -83,7 +83,7 @@ Check if Arkadiy Dobkin present as a user, if not then search info about him in 
 2. **Notification**: Client sends `notifications/initialized`
 3. **Discovery**: Client calls `tools/list` to get available tools
 4. **Operation**: Client calls `tools/call` with specific tool and arguments
-5. **Shutdown**: `DELETE, {host}, Mcp-Session-Id: {Mcp-Session-Id}`, shutdown is not covered in this practice, but it's simple REST request
+5. **Shutdown**: Close HTTP connection for Streamable HTTP
 
 ---
 
