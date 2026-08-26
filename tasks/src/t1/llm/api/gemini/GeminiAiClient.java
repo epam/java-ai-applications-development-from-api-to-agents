@@ -1,5 +1,7 @@
 package t1.llm.api.gemini;
 
+import java.util.List;
+
 import com.google.genai.Client;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentConfig;
@@ -8,9 +10,6 @@ import commons.exceptions.TaskNotImplementedException;
 import commons.model.Message;
 import commons.model.Role;
 import t1.llm.api.AiClient;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Google Gemini client using the official Google GenAI Java SDK.
@@ -33,7 +32,7 @@ public class GeminiAiClient extends AiClient {
         // https://github.com/googleapis/java-genai
         // - Build a Client using Client.builder(), set apiKey, and call build()
         // - Assign the result to this.client
-        throw new TaskNotImplementedException();
+        this.client = Client.builder().apiKey(apiKey).build();
     }
 
     @Override
@@ -45,7 +44,13 @@ public class GeminiAiClient extends AiClient {
         // - Extract text from response via resp.text(); treat null as empty string
         // - Print content to stdout
         // - Return new Message(Role.ASSISTANT, content)
-        throw new TaskNotImplementedException();
+        var config = buildConfig();
+        var contents = buildContents(messages);
+        var response = client.models.generateContent(modelName, contents, config);
+
+        var responseText = (response.text() == null) ? "" : response.text();
+        System.out.println(responseText);
+        return new Message(Role.ASSISTANT, responseText);
     }
 
     @Override
@@ -58,7 +63,22 @@ public class GeminiAiClient extends AiClient {
         // - Print each non-empty text to stdout; accumulate in a StringBuilder
         // - Print a newline after the stream ends
         // - Return new Message(Role.ASSISTANT, accumulated content)
-        throw new TaskNotImplementedException();
+        var config = buildConfig();
+        var contents = buildContents(messages);
+        var sb = new StringBuilder();
+        try (var streamingResponse = client.models.generateContentStream(modelName, contents, config)) {
+            streamingResponse.forEach(chunk ->
+                {
+                    var text = chunk.text();
+                    if (text != null || !text.isEmpty()) {
+                        System.out.print(text);
+                        sb.append(text);
+                    }
+                }
+            );
+        }
+        System.out.println();
+        return new Message(Role.ASSISTANT, sb.toString());
     }
 
     private GenerateContentConfig buildConfig() {
@@ -66,7 +86,13 @@ public class GeminiAiClient extends AiClient {
         // - Build a GenerateContentConfig with systemInstruction set to a Content containing Part.fromText(systemPrompt)
         // - Set maxOutputTokens
         // - Build and return the config
-        throw new TaskNotImplementedException();
+        return GenerateContentConfig.builder()
+            .systemInstruction(
+                Content.builder()
+                    .parts(Part.fromText(systemPrompt))
+                    .build())
+            .maxOutputTokens(1024)
+            .build();
     }
 
     private List<Content> buildContents(List<Message> messages) {
@@ -75,13 +101,18 @@ public class GeminiAiClient extends AiClient {
         //   - role: toGeminiRole(m.role())
         //   - parts: a single Part.fromText(m.content())
         // - Collect all Content objects into a List and return
-        throw new TaskNotImplementedException();
+        return messages.stream()
+            .map(message -> Content.builder()
+                .role(toGeminiRole(message.role()))
+                .parts(Part.fromText(message.content()))
+                .build())
+            .toList();
     }
 
     private String toGeminiRole(Role role) {
         //TODO:
         // - Return "model" if the role is Role.ASSISTANT (Gemini uses "model" not "assistant")
         // - Otherwise return role.getValue()
-        throw new TaskNotImplementedException();
+        return (Role.ASSISTANT.equals(role) ? "model" : role.getValue());
     }
 }

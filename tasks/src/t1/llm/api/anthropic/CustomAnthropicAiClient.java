@@ -52,7 +52,27 @@ public class CustomAnthropicAiClient extends AiClient {
         // - Print content to stdout
         // - Return new Message(Role.ASSISTANT, content)
         // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        try {
+            String body = buildRequestBody(messages, false);
+            HttpRequest request = buildRequest(body);
+            HttpResponse<String> resp = http.send(request, HttpResponse.BodyHandlers.ofString());
+            if (resp.statusCode() != 200) {
+                throw new RuntimeException("HTTP " + resp.statusCode() + ": " + resp.body());
+            }
+            JsonNode root = MAPPER.readTree(resp.body());
+            StringBuilder content = new StringBuilder();
+            for (JsonNode block : root.path("content")) {
+                if ("text".equals(block.path("type").asText())) {
+                    content.append(block.path("text").asText(""));
+                }
+            }
+            System.out.println(content);
+            return new Message(Role.ASSISTANT, content.toString());
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -69,7 +89,41 @@ public class CustomAnthropicAiClient extends AiClient {
         // - Print a newline after the stream ends
         // - Return new Message(Role.ASSISTANT, accumulated content)
         // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        try {
+            String body = buildRequestBody(messages, true);
+            HttpRequest request = buildRequest(body);
+            HttpResponse<Stream<String>> resp =
+                http.send(request, HttpResponse.BodyHandlers.ofLines());
+            var sb = new StringBuilder();
+            boolean[] done = {false};
+            Iterator<String> iter = resp.body().iterator();
+            while (iter.hasNext() && !done[0]) {
+                String line = iter.next();
+                if (!line.startsWith("data: ")) {
+                    continue;
+                }
+                JsonNode parsed = MAPPER.readTree(line.substring(6).strip());
+                String type = parsed.path("type").asText();
+                if ("content_block_delta".equals(type)) {
+                    JsonNode delta = parsed.path("delta");
+                    if ("text_delta".equals(delta.path("type").asText())) {
+                        String text = delta.path("text").asText("");
+                        if (!text.isEmpty()) {
+                            System.out.print(text);
+                            sb.append(text);
+                        }
+                    }
+                } else if ("message_stop".equals(type)) {
+                    done[0] = true;
+                }
+            }
+            System.out.println();
+            return new Message(Role.ASSISTANT, sb.toString());
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private HttpRequest buildRequest(String body) {
@@ -80,7 +134,13 @@ public class CustomAnthropicAiClient extends AiClient {
         // - Add "anthropic-version: 2023-06-01" header (required by Anthropic API)
         // - Set POST body with HttpRequest.BodyPublishers.ofString(body)
         // - Build and return the HttpRequest
-        throw new TaskNotImplementedException();
+        return HttpRequest.newBuilder()
+            .uri(URI.create(endpoint))
+            .header("x-api-key", apiKey)
+            .header("Content-Type", "application/json")
+            .header("anthropic-version", "2023-06-01")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
     }
 
     private String buildRequestBody(List<Message> messages, boolean stream) {
@@ -90,6 +150,18 @@ public class CustomAnthropicAiClient extends AiClient {
         // - If stream is true, add "stream": true
         // - Serialize to JSON string with ObjectMapper and return
         // - Wrap checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        try {
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("model", modelName);
+            body.put("system", systemPrompt);
+            body.put("max_tokens", 1024);
+            body.put("messages", messages.stream().map(Message::toMap).toList());
+            if (stream) {
+                body.put("stream", true);
+            }
+            return MAPPER.writeValueAsString(body);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

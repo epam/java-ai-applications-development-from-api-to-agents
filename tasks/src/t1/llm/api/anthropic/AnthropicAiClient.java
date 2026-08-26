@@ -1,21 +1,24 @@
 package t1.llm.api.anthropic;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import com.anthropic.models.messages.ContentBlock;
 import com.anthropic.models.messages.MessageCreateParams;
-import commons.exceptions.TaskNotImplementedException;
-import t1.llm.api.AiClient;
+import com.anthropic.models.messages.RawMessageStreamEvent;
+import com.anthropic.models.messages.TextBlock;
 import commons.model.Message;
 import commons.model.Role;
-
-import java.util.List;
+import t1.llm.api.AiClient;
 
 /**
  * Anthropic Claude client using the official Anthropic Java SDK.
  * <p>
- * Claude's API differs from OpenAI: the system prompt is a separate {@code system} parameter,
- * not a message in the conversation. Max tokens must always be specified.
- * Compare with {@link CustomAnthropicAiClient} for the raw HTTP equivalent.
+ * Claude's API differs from OpenAI: the system prompt is a separate {@code system} parameter, not a message in the
+ * conversation. Max tokens must always be specified. Compare with {@link CustomAnthropicAiClient} for the raw HTTP
+ * equivalent.
  */
 public class AnthropicAiClient extends AiClient {
 
@@ -27,7 +30,9 @@ public class AnthropicAiClient extends AiClient {
         // - https://github.com/anthropics/anthropic-sdk-java
         // - Build an AnthropicClient using AnthropicOkHttpClient.builder(), set apiKey, and call build()
         // - Assign the result to this.client
-        throw new TaskNotImplementedException();
+        this.client = AnthropicOkHttpClient.builder()
+            .apiKey(apiKey)
+            .build();
     }
 
     @Override
@@ -38,7 +43,17 @@ public class AnthropicAiClient extends AiClient {
         // - Filter the response content blocks for isText(); extract text via asText().text(); concatenate
         // - Print content to stdout
         // - Return new Message(Role.ASSISTANT, content)
-        throw new TaskNotImplementedException();
+
+        var params = buildParams(messages);
+        var response = client.messages().create(params);
+        var message = response.content()
+            .stream()
+            .filter(ContentBlock::isText)
+            .map(ContentBlock::asText)
+            .map(TextBlock::text)
+            .collect(Collectors.joining(""));
+        System.out.println(message);
+        return new Message(Role.ASSISTANT, message);
     }
 
     @Override
@@ -51,7 +66,24 @@ public class AnthropicAiClient extends AiClient {
         // - Print each non-empty text to stdout; accumulate in a StringBuilder
         // - Print a newline after the stream ends
         // - Return new Message(Role.ASSISTANT, accumulated content)
-        throw new TaskNotImplementedException();
+        var params = buildParams(messages);
+        var sb = new StringBuilder();
+        try (var stream = client.messages().createStreaming(params)) {
+            stream.stream()
+                .filter(RawMessageStreamEvent::isContentBlockDelta)
+                .forEach(event -> {
+                    var delta = event.asContentBlockDelta().delta();
+                    if (delta.isText()) {
+                        var content = delta.asText().text();
+                        if (!content.isEmpty()) {
+                            System.out.print(content);
+                            sb.append(content);
+                        }
+                    }
+                });
+        }
+        System.out.println();
+        return new Message(Role.ASSISTANT, sb.toString());
     }
 
     private MessageCreateParams buildParams(List<Message> messages) {
@@ -59,6 +91,17 @@ public class AnthropicAiClient extends AiClient {
         // - Create a MessageCreateParams builder; set model, system (systemPrompt), and maxTokens (e.g. 1024)
         // - Iterate messages: USER → addUserMessage(), ASSISTANT → addAssistantMessage()
         // - Build and return the params
-        throw new TaskNotImplementedException();
+        var builder = MessageCreateParams.builder()
+            .model(modelName)
+            .system(systemPrompt)
+            .maxTokens(1024);
+
+        for (Message message : messages) {
+            switch (message.role()) {
+                case ASSISTANT -> builder.addAssistantMessage(message.content());
+                case USER -> builder.addUserMessage(message.content());
+            }
+        }
+        return builder.build();
     }
 }

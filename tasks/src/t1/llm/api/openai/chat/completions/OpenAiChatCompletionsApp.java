@@ -25,7 +25,7 @@ public class OpenAiChatCompletionsApp {
         );
 
         // Switch between sdkClient and customClient to compare SDK vs raw HTTP
-        BaseApp.start(true, sdkClient);
+        BaseApp.start(true, customClient);
     }
 
 }

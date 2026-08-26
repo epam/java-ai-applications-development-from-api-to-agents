@@ -1,10 +1,9 @@
 package t1.llm.api;
 
+import java.util.List;
 
 import commons.exceptions.TaskNotImplementedException;
 import commons.model.Message;
-
-import java.util.List;
 
 /**
  * Abstract base class for AI service clients.
@@ -21,10 +20,13 @@ public abstract class AiClient {
     protected String systemPrompt;
 
     protected AiClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
-        //TODO:
-        // - Validate that apiKey is not null or blank; throw IllegalArgumentException if invalid
-        // - Assign endpoint, modelName, apiKey, and systemPrompt to the corresponding protected fields
-        throw new TaskNotImplementedException();
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalArgumentException("apiKey can't be null or blank");
+        }
+        this.apiKey = apiKey;
+        this.endpoint = endpoint;
+        this.modelName = modelName;
+        this.systemPrompt = systemPrompt;
     }
 
     /**

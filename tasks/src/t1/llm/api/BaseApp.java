@@ -1,18 +1,16 @@
 package t1.llm.api;
 
+import java.util.Scanner;
 
-import commons.exceptions.TaskNotImplementedException;
 import commons.model.Conversation;
 import commons.model.Message;
 import commons.model.Role;
 
-import java.util.Scanner;
-
 /**
  * Interactive chat loop shared by all provider App classes.
  * <p>
- * Reads user input from stdin, maintains conversation history, calls the chosen client,
- * and loops until the user types "exit".
+ * Reads user input from stdin, maintains conversation history, calls the chosen client, and loops until the user types
+ * "exit".
  */
 public class BaseApp {
 
@@ -29,6 +27,24 @@ public class BaseApp {
         //   - Print "AI: " prefix (no newline)
         //   - Call client.streamResponse() or client.response() depending on the stream flag
         //   - Add the returned AI Message to Conversation
-        throw new TaskNotImplementedException();
+
+        var conversation = new Conversation();
+        var scanner = new Scanner(System.in);
+        System.out.println("To exit from the chat, type \"exit\"");
+
+        while (true) {
+            System.out.print("=> ");
+            var prompt = scanner.nextLine();
+            if (prompt.equals("exit")) {
+                System.out.println("Good bye!");
+                break;
+            }
+
+            var message = new Message(Role.USER, prompt);
+            conversation.addMessage(message);
+            System.out.print("AI: ");
+            conversation.addMessage((stream) ? client.streamResponse(conversation.getMessages())
+                : client.response(conversation.getMessages()));
+        }
     }
 }
